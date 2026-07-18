@@ -1,0 +1,32 @@
+module Core (
+    clk: input clock,
+    rst: input reset,
+    bus: modport Membus::master,
+) {
+    var regfile: logic<32, 32>;
+
+    // program counter
+    var pc: logic<32>;
+
+    always_ff {
+        if_reset {
+            pc = 0;
+        } else {
+            pc = pc + 4;
+        }
+    }
+
+    // fetch
+    var instr: logic<32>;
+    always_comb {
+        bus.addr = pc;
+        instr = bus.rdata;
+    }
+
+    always_ff {
+        $display("Addr: %h", bus.addr);
+        $display("Inst: %h", bus.rdata);
+
+        $display("====================");
+    }
+}

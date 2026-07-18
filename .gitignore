@@ -1,0 +1,14 @@
+# Nix
+.envrc
+.direnv
+
+# Veryl
+*.sv
+*.map
+*.f
+*.lock
+/dependencies
+/.build
+
+# gtkwave
+*.vcd

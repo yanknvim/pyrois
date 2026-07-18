@@ -1,0 +1,18 @@
+module Memory (
+    bus: modport Membus::slave,
+) {
+    var mem: logic<8> [16384]; // 16KB
+
+    initial {
+        $readmemh("src/test_fetch.hex", mem);
+    }
+
+    always_comb {
+        bus.rdata = {
+            mem[bus.addr+3],
+            mem[bus.addr+2],
+            mem[bus.addr+1],
+            mem[bus.addr],
+        };
+    }
+}

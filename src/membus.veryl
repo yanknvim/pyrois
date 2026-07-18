@@ -1,0 +1,13 @@
+interface Membus {
+    var addr: logic<32>;
+    var rdata: logic<32>;
+
+    modport master {
+        addr: output,
+        rdata: input,
+    }
+
+    modport slave {
+        ..converse(master)
+    }
+}

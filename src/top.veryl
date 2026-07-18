@@ -1,0 +1,16 @@
+module Top (
+    clk: input clock,
+    rst: input reset,
+) {
+    inst membus: Membus;
+
+    inst core: Core (
+        clk,
+        rst,
+        bus: membus,
+    );
+
+    inst memory: Memory (
+        bus: membus
+    );
+}

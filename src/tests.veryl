@@ -1,0 +1,16 @@
+#[test(test_fetch)]
+module test_fetch {
+    inst clk: $tb::clock_gen;
+    inst rst: $tb::reset_gen ( clk );
+
+    inst top: Top (
+        clk,
+        rst
+    );
+
+    initial {
+        rst.assert();
+        clk.next(10);
+        $finish();
+    }
+}
