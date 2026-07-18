@@ -1,0 +1,20 @@
+module Alu (
+    rs1_data: input logic<32>,
+    rs2_data: input logic<32>,
+    imm: input logic<32>,
+    ctrl: input CtrlSignals,
+    data: output logic<32>,
+) {
+    import Consts::*;
+    import Ctrl::*;
+
+    let a: logic<32> = rs1_data;
+    let b: logic<32> = if ctrl.alu_src_b ? imm : rs2_data;
+
+    always_comb {
+        data = case ctrl.itype {
+            InstType::I: a + b,
+            default : 'x,
+        };
+    }
+}

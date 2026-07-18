@@ -1,8 +1,12 @@
 module Core (
     clk: input clock,
     rst: input reset,
-    bus: modport Membus::master,
+    ibus: modport InstMembus::master,
+    dbus: modport DataMembus::master,
 ) {
+    import Consts::*;
+    import Ctrl::*;
+
     var regfile: logic<32, 32>;
 
     // program counter
@@ -11,6 +15,9 @@ module Core (
     always_ff {
         if_reset {
             pc = 0;
+            for i in 0..32 {
+                regfile[i] = 0;
+            }
         } else {
             pc = pc + 4;
         }
@@ -19,13 +26,58 @@ module Core (
     // fetch
     var instr: logic<32>;
     always_comb {
-        bus.addr = pc;
-        instr = bus.rdata;
+        ibus.addr = pc;
+        instr = ibus.rdata;
+    }
+
+    let rs1_addr: logic<5> = instr[19:15];
+    let rs2_addr: logic<5> = instr[24:20];
+    let rd_addr: logic<5>  = instr[11:7];
+
+    let rs1_data: logic<32> = if rs1_addr == 0 ? 0 : regfile[rs1_addr];
+    let rs2_data: logic<32> = if rs2_addr == 0 ? 0 : regfile[rs2_addr];
+
+    // decode
+    var imm: logic<32>;
+    var ctrl: CtrlSignals;
+    inst decoder: Decoder (
+        instr,
+        imm,
+        ctrl,
+    );
+
+    // ALU
+    var alu_out: logic<32>;
+    inst alu: Alu (
+        rs1_data,
+        rs2_data,
+        imm,
+        ctrl,
+        data: alu_out,
+    );
+
+    always_comb {
+        dbus.addr = alu_out;
+    }
+
+    let wb_data: logic<32> = dbus.rdata;
+
+    always_ff {
+        if ctrl.is_load && rd_addr != 0 {
+            regfile[rd_addr] = wb_data;
+        }
     }
 
     always_ff {
-        $display("Addr: %h", bus.addr);
-        $display("Inst: %h", bus.rdata);
+        $display("Addr:     %h", ibus.addr);
+        $display("Inst:     %h", instr);
+        $display("rs1_addr: %h", rs1_addr);
+        $display("rs2_addr: %h", rs2_addr);
+        $display("rd_addr:  %h", rd_addr);
+        $display("rs1_data: %h", rs1_data);
+        $display("rs2_data: %h", rs2_data);
+        $display("wb_data:  %h", wb_data);
+        $display("DataAddr :%h", dbus.addr);
 
         $display("====================");
     }

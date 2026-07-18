@@ -2,15 +2,18 @@ module Top (
     clk: input clock,
     rst: input reset,
 ) {
-    inst membus: Membus;
+    inst ibus: InstMembus;
+    inst dbus: DataMembus;
 
     inst core: Core (
         clk,
         rst,
-        bus: membus,
+        ibus: ibus,
+        dbus: dbus,
     );
 
-    inst memory: Memory (
-        bus: membus
+    inst mem: Memory (
+        ibus: ibus,
+        dbus: dbus,
     );
 }

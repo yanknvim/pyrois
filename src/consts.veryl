@@ -1,0 +1,5 @@
+package Consts {
+    const XLEN: logic<32> = 32;
+
+    const OP_LOAD: logic<7> = 7'b0000011;
+}

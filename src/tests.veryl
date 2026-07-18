@@ -1,5 +1,5 @@
-#[test(test_fetch)]
-module test_fetch {
+#[test(test_lw)]
+module test_lw {
     inst clk: $tb::clock_gen;
     inst rst: $tb::reset_gen ( clk );
 
@@ -10,7 +10,7 @@ module test_fetch {
 
     initial {
         rst.assert();
-        clk.next(10);
+        clk.next(2);
         $finish();
     }
 }

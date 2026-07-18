@@ -1,18 +1,31 @@
 module Memory (
-    bus: modport Membus::slave,
+    ibus: modport InstMembus::slave,
+    dbus: modport DataMembus::slave,
 ) {
     var mem: logic<8> [16384]; // 16KB
 
     initial {
-        $readmemh("src/test_fetch.hex", mem);
+        $readmemh("src/tests/test_lw.hex", mem);
+    }
+
+    let iaddr: logic<14> = ibus.addr[13:0];
+    let daddr: logic<14> = dbus.addr[13:0];
+
+    always_comb {
+        ibus.rdata = {
+            mem[iaddr+3],
+            mem[iaddr+2],
+            mem[iaddr+1],
+            mem[iaddr],
+        };
     }
 
     always_comb {
-        bus.rdata = {
-            mem[bus.addr+3],
-            mem[bus.addr+2],
-            mem[bus.addr+1],
-            mem[bus.addr],
+        dbus.rdata = {
+            mem[daddr+3],
+            mem[daddr+2],
+            mem[daddr+1],
+            mem[daddr],
         };
     }
 }

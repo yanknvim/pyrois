@@ -1,0 +1,36 @@
+import Consts::*;
+import Ctrl::*;
+
+module Decoder (
+    instr: input logic<32>,
+    imm: output logic<32>,
+    ctrl: output CtrlSignals,
+) {
+    const T: logic = 1'b1;
+    const F: logic = 1'b0;
+
+    let op: logic<7> = instr[6:0];
+
+    let funct3: logic<3> = instr[14:12];
+    let funct7: logic<7> = instr[31:25];
+
+    always_comb {
+        imm = case op {
+            OP_LOAD : { instr[31] repeat 20, instr[31:20] },
+            default : 'x,
+        };
+
+        ctrl = {
+            case op {
+                OP_LOAD : {
+                    InstType::I, T, T,
+                },
+                default : {
+                    InstType::X, F, F,
+                },
+            },
+            funct3,
+            funct7,
+        };
+    }
+}
