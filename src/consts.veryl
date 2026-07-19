@@ -21,20 +21,29 @@ package Consts {
     const FUNCT3_OR     : logic<3> = 3'b110;
     const FUNCT3_AND    : logic<3> = 3'b111;
 
+    // funct3 memory
+
+    const FUNCT3_B : logic<3> = 000;
+    const FUNCT3_H : logic<3> = 001;
+    const FUNCT3_W : logic<3> = 010;
+    const FUNCT3_BU: logic<3> = 100;
+    const FUNCT3_HU: logic<3> = 101;
+    const FUNCT3_HW: logic<3> = 110;
+
     // funct7
-    const FUNCT7_ADD     : logic<7> = 7'b0000000;
-    const FUNCT7_SUB     : logic<7> = 7'b0100000;
-    const FUNCT7_SLL     : logic<7> = 7'b0000000;
-    const FUNCT7_SRL     : logic<7> = 7'b0000000;
-    const FUNCT7_SRA     : logic<7> = 7'b0100000;
-    const FUNCT7_SLT     : logic<7> = 7'b0000000;
-    const FUNCT7_SLTU    : logic<7> = 7'b0000000;
+    const FUNCT7_ADD : logic<7> = 7'b0000000;
+    const FUNCT7_SUB : logic<7> = 7'b0100000;
+    const FUNCT7_SLL : logic<7> = 7'b0000000;
+    const FUNCT7_SRL : logic<7> = 7'b0000000;
+    const FUNCT7_SRA : logic<7> = 7'b0100000;
+    const FUNCT7_SLT : logic<7> = 7'b0000000;
+    const FUNCT7_SLTU: logic<7> = 7'b0000000;
 
     // branch
-    const BR_BEQ:  logic<3> = 3'b000;
-    const BR_BNE:  logic<3> = 3'b001;
-    const BR_BLT:  logic<3> = 3'b100;
-    const BR_BGE:  logic<3> = 3'b101;
+    const BR_BEQ : logic<3> = 3'b000;
+    const BR_BNE : logic<3> = 3'b001;
+    const BR_BLT : logic<3> = 3'b100;
+    const BR_BGE : logic<3> = 3'b101;
     const BR_BLTU: logic<3> = 3'b110;
     const BR_BGEU: logic<3> = 3'b111;
 }

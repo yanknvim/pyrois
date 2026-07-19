@@ -8,8 +8,8 @@ module Top #(
     inst dbus: DataMembus;
 
     inst core: Core (
-        clk,
-        rst,
+        clk       ,
+        rst       ,
         ibus: ibus,
         dbus: dbus,
     );
@@ -17,8 +17,8 @@ module Top #(
     inst mem: Memory #(
         HEX_FILE: HEX_FILE,
     ) (
-        clk,
-        rst,
+        clk       ,
+        rst       ,
         ibus: ibus,
         dbus: dbus,
     );

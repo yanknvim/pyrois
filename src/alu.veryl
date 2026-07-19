@@ -1,10 +1,10 @@
 module Alu (
-    rs1_data: input logic<32>,
-    rs2_data: input logic<32>,
-    imm: input logic<32>,
-    pc: input logic<32>,
-    ctrl: input CtrlSignals,
-    data: output logic<32>,
+    rs1_data: input  logic      <32>,
+    rs2_data: input  logic      <32>,
+    imm     : input  logic      <32>,
+    pc      : input  logic      <32>,
+    ctrl    : input  CtrlSignals    ,
+    data    : output logic      <32>,
 ) {
     import Consts::*;
     import Ctrl::*;
@@ -20,8 +20,8 @@ module Alu (
     let arith_result: logic<32> = case ctrl.funct3 {
         FUNCT3_ADD_SUB: if is_sub ? a - b : a + b,
         FUNCT3_SLL    : a << shamt,
-        FUNCT3_SLT    : if $signed(a) <: $signed(b) ? 1 : 0,
-        FUNCT3_SLTU   : if a <: b ? 1 : 0,
+        FUNCT3_SLT    : $signed(a) <: $signed(b),
+        FUNCT3_SLTU   : a <: b,
         FUNCT3_XOR    : a ^ b,
         FUNCT3_SRL_SRA: if is_sra ? $signed(a) >>> shamt : a >> shamt,
         FUNCT3_OR     : a | b,

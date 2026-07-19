@@ -1,8 +1,8 @@
 module Memory #(
     param HEX_FILE: string = "src/tests/test_sw.hex",
 ) (
-    clk: input clock,
-    rst: input reset,
+    clk : input   clock            ,
+    rst : input   reset            ,
     ibus: modport InstMembus::slave,
     dbus: modport DataMembus::slave,
 ) {
@@ -16,29 +16,27 @@ module Memory #(
     let daddr: logic<14> = dbus.addr[13:0];
 
     always_comb {
-        ibus.rdata = {
-            mem[iaddr+3],
-            mem[iaddr+2],
-            mem[iaddr+1],
-            mem[iaddr],
-        };
+        ibus.rdata = {mem[iaddr + 3], mem[iaddr + 2], mem[iaddr + 1], mem[iaddr],};
     }
 
     always_comb {
-        dbus.rdata = {
-            mem[daddr+3],
-            mem[daddr+2],
-            mem[daddr+1],
-            mem[daddr],
-        };
+        dbus.rdata = {mem[daddr + 3], mem[daddr + 2], mem[daddr + 1], mem[daddr],};
     }
 
     always_ff {
         if dbus.wen {
-            mem[daddr] = dbus.wdata[7:0];
-            mem[daddr+1] = dbus.wdata[15:8];
-            mem[daddr+2] = dbus.wdata[23:16];
-            mem[daddr+3] = dbus.wdata[31:24];
+            if dbus.be[0] {
+                mem[daddr]     = dbus.wdata[7:0];
+            }
+            if dbus.be[1] {
+                mem[daddr + 1] = dbus.wdata[15:8];
+            }
+            if dbus.be[2] {
+                mem[daddr + 2] = dbus.wdata[23:16];
+            }
+            if dbus.be[3] {
+                mem[daddr + 3] = dbus.wdata[31:24];
+            }
         }
     }
 }

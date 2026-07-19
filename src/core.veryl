@@ -1,11 +1,12 @@
+import Consts::*;
+import Ctrl::*;
+
 module Core (
-    clk: input clock,
-    rst: input reset,
+    clk : input   clock             ,
+    rst : input   reset             ,
     ibus: modport InstMembus::master,
     dbus: modport DataMembus::master,
 ) {
-    import Consts::*;
-    import Ctrl::*;
 
     var regfile: logic<32, 32>;
 
@@ -16,72 +17,79 @@ module Core (
     var instr: logic<32>;
     always_comb {
         ibus.addr = pc;
-        instr = ibus.rdata;
+        instr     = ibus.rdata;
     }
 
     let rs1_addr: logic<5> = instr[19:15];
     let rs2_addr: logic<5> = instr[24:20];
-    let rd_addr: logic<5>  = instr[11:7];
+    let rd_addr : logic<5> = instr[11:7];
 
     let rs1_data: logic<32> = if rs1_addr == 0 ? 0 : regfile[rs1_addr];
     let rs2_data: logic<32> = if rs2_addr == 0 ? 0 : regfile[rs2_addr];
 
     // decode
-    var imm: logic<32>;
-    var ctrl: CtrlSignals;
-    inst decoder: Decoder (
-        instr,
-        imm,
-        ctrl,
-    );
+    var imm : logic      <32>;
+    var ctrl: CtrlSignals    ;
+    inst decoder: Decoder ( instr, imm, ctrl );
 
     // ALU
     var alu_out: logic<32>;
     inst alu: Alu (
-        rs1_data,
-        rs2_data,
-        imm,
-        pc,
-        ctrl,
-        data: alu_out,
+        rs1_data         ,
+        rs2_data         ,
+        imm              ,
+        pc               ,
+        ctrl             ,
+        data    : alu_out,
     );
 
     // Branch
     var is_br: logic;
-    inst branch: BranchUnit (
-        ctrl,
-        rs1_data,
-        rs2_data,
-        is_br,
-    );
+    inst branch: BranchUnit ( ctrl, rs1_data, rs2_data, is_br );
+
+    let addr_lo: logic<2> = alu_out[1:0];
 
     always_comb {
-        dbus.addr = alu_out;
-        dbus.wen = ctrl.is_store;
+        dbus.addr  = alu_out;
+        dbus.wen   = ctrl.is_store;
         dbus.wdata = rs2_data;
+        dbus.be    = case ctrl.funct3 {
+            FUNCT3_B: 4'b0001 <: addr_lo,
+            FUNCT3_H: 4'b0011 <: addr_lo,
+            FUNCT3_W: 4'b1111,
+            default : 4'b0000,
+        };
     }
 
+    let shift        : logic<5>  = {addr_lo, 3'b000};
+    let rdata_shifted: logic<32> = dbus.rdata >> shift;
+
+    let load_data: logic<32> = case ctrl.funct3 {
+        FUNCT3_B : {rdata_shifted[7] repeat 24, rdata_shifted[7:0]},
+        FUNCT3_H : {rdata_shifted[15] repeat 16, rdata_shifted[15:0]},
+        FUNCT3_W : rdata_shifted,
+        FUNCT3_BU: {0 repeat 24, rdata_shifted[7:0]},
+        FUNCT3_HU: {0 repeat 16, rdata_shifted[15:0]},
+        default  : rdata_shifted,
+    };
+
     let wb_data: logic<32> = switch {
-        ctrl.is_load : dbus.rdata,
+        ctrl.is_load: load_data,
         ctrl.is_jump: pc + 4,
-        default : alu_out,
+        default     : alu_out,
+    };
+
+    let next_pc: logic<32> = switch {
+        is_br       : pc + imm,
+        ctrl.is_jump: if ctrl.itype == InstType::I ? alu_out & ~1 : pc + imm,
+        default     : pc + 4,
     };
 
     always_ff {
         if_reset {
             pc = 0;
         } else {
-            if is_br {
-                pc = pc + imm;
-            } else if ctrl.is_jump {
-                if ctrl.itype == InstType::I {
-                    pc = alu_out & ~1;
-                } else {
-                    pc = pc + imm;
-                }
-            } else {
-                pc = pc + 4;
-            }
+            pc = next_pc;
         }
     }
 

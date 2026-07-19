@@ -10,15 +10,15 @@ package Ctrl {
     }
 
     struct CtrlSignals {
-        itype: InstType,
-        alu_src_a: logic, // T: pc, F: rs1
-        alu_src_b: logic, // T: imm, F: rs2
-        reg_wb: logic,
-        is_load: logic,
-        is_store: logic,
-        is_branch: logic,
-        is_jump: logic,
-        funct3: logic<3>,
-        funct7: logic<7>,
+        itype    : InstType   ,
+        alu_src_a: logic      , // T: pc, F: rs1
+        alu_src_b: logic      , // T: imm, F: rs2
+        reg_wb   : logic      ,
+        is_load  : logic      ,
+        is_store : logic      ,
+        is_branch: logic      ,
+        is_jump  : logic      ,
+        funct3   : logic   <3>,
+        funct7   : logic   <7>,
     }
 }

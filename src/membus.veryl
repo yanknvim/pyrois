@@ -1,10 +1,10 @@
 interface InstMembus {
-    var addr: logic<32>;
+    var addr : logic<32>;
     var rdata: logic<32>;
 
     modport master {
-        addr: output,
-        rdata: input,
+        addr : output,
+        rdata: input ,
     }
 
     modport slave {
@@ -13,16 +13,18 @@ interface InstMembus {
 }
 
 interface DataMembus {
-    var addr: logic<32>;
+    var addr : logic<32>;
     var rdata: logic<32>;
     var wdata: logic<32>;
-    var wen: logic;
+    var wen  : logic    ;
+    var be   : logic<4> ;
 
     modport master {
-        addr: output,
-        rdata: input,
+        addr : output,
+        rdata: input ,
         wdata: output,
-        wen: output,
+        wen  : output,
+        be   : output,
     }
 
     modport slave {

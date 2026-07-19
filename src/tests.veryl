@@ -3,14 +3,11 @@ module test_lw {
     inst clk: $tb::clock_gen;
     inst rst: $tb::reset_gen ( clk );
 
-    inst top: Top (
-        clk,
-        rst
-    );
+    inst top: Top ( clk, rst );
 
     initial {
         rst.assert();
-        clk.next(2);
-        $finish();
+        clk.next  (2);
+        $finish   ();
     }
 }

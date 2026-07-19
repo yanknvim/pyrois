@@ -2,21 +2,25 @@ import Consts::*;
 import Ctrl::*;
 
 module BranchUnit (
-    ctrl: input CtrlSignals,
-    rs1_data: input logic<32>,
-    rs2_data: input logic<32>,
-    is_br: output logic,
+    ctrl    : input  CtrlSignals    ,
+    rs1_data: input  logic      <32>,
+    rs2_data: input  logic      <32>,
+    is_br   : output logic          ,
 ) {
 
     always_comb {
-        is_br = if !ctrl.is_branch ? 1'b0 : case ctrl.funct3 {
-            BR_BEQ : rs1_data == rs2_data,
-            BR_BNE : rs1_data != rs2_data,
-            BR_BLT : $signed(rs1_data) <: $signed(rs2_data),
-            BR_BGE : !($signed(rs1_data) <: $signed(rs2_data)),
-            BR_BLTU: rs1_data <: rs2_data,
-            BR_BGEU: !(rs1_data <: rs2_data),
-            default: 'x,
-        };
+        is_br = if !ctrl.is_branch ?
+            1'b0
+        :
+            case ctrl.funct3 {
+                BR_BEQ : rs1_data == rs2_data,
+                BR_BNE : rs1_data != rs2_data,
+                BR_BLT : $signed(rs1_data) <: $signed(rs2_data),
+                BR_BGE : !($signed(rs1_data) <: $signed(rs2_data)),
+                BR_BLTU: rs1_data <: rs2_data,
+                BR_BGEU: !(rs1_data <: rs2_data),
+                default: 'x,
+            }
+        ;
     }
 }
