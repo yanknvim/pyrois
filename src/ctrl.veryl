@@ -5,11 +5,13 @@ package Ctrl {
         R,
         B,
         J,
+        U,
         X,
     }
 
     struct CtrlSignals {
         itype: InstType,
+        alu_src_a: logic, // T: pc, F: rs1
         alu_src_b: logic, // T: imm, F: rs2
         reg_wb: logic,
         is_load: logic,

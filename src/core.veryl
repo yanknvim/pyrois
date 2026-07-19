@@ -41,6 +41,7 @@ module Core (
         rs1_data,
         rs2_data,
         imm,
+        pc,
         ctrl,
         data: alu_out,
     );

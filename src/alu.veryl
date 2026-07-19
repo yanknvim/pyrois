@@ -2,13 +2,14 @@ module Alu (
     rs1_data: input logic<32>,
     rs2_data: input logic<32>,
     imm: input logic<32>,
+    pc: input logic<32>,
     ctrl: input CtrlSignals,
     data: output logic<32>,
 ) {
     import Consts::*;
     import Ctrl::*;
 
-    let a: logic<32> = rs1_data;
+    let a: logic<32> = if ctrl.alu_src_a ? pc : rs1_data;
     let b: logic<32> = if ctrl.alu_src_b ? imm : rs2_data;
 
     let is_sub: logic = ctrl.itype == InstType::R && ctrl.funct7 == FUNCT7_SUB;
@@ -33,6 +34,7 @@ module Alu (
             InstType::I: if ctrl.is_load ? a + b : arith_result,
             InstType::S: a + b,
             InstType::R: arith_result,
+            InstType::U: if ctrl.alu_src_a ? a + b : b,
             InstType::J: 0,
             default    : 0,
         };
