@@ -12,10 +12,17 @@ module Alu (
     let b: logic<32> = if ctrl.alu_src_b ? imm : rs2_data;
 
     let is_sub: logic = ctrl.itype == InstType::R && ctrl.funct7 == FUNCT7_SUB;
+    let is_sra: logic = ctrl.funct7 == FUNCT7_SRA;
+
+    let shamt: logic<5> = b[4:0];
 
     let arith_result: logic<32> = case ctrl.funct3 {
         FUNCT3_ADD_SUB: if is_sub ? a - b : a + b,
+        FUNCT3_SLL    : a << shamt,
+        FUNCT3_SLT    : if $signed(a) <: $signed(b) ? 1 : 0,
+        FUNCT3_SLTU   : if a <: b ? 1 : 0,
         FUNCT3_XOR    : a ^ b,
+        FUNCT3_SRL_SRA: if is_sra ? $signed(a) >>> shamt : a >> shamt,
         FUNCT3_OR     : a | b,
         FUNCT3_AND    : a & b,
         default       : 0,

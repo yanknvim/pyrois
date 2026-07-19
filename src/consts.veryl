@@ -8,11 +8,20 @@ package Consts {
 
     // funct3
     const FUNCT3_ADD_SUB: logic<3> = 3'b000;
-    const FUNCT3_XOR     : logic<3> = 3'b100;
-    const FUNCT3_OR      : logic<3> = 3'b110;
-    const FUNCT3_AND     : logic<3> = 3'b111;
+    const FUNCT3_SLL    : logic<3> = 3'b001;
+    const FUNCT3_SLT    : logic<3> = 3'b010;
+    const FUNCT3_SLTU   : logic<3> = 3'b011;
+    const FUNCT3_XOR    : logic<3> = 3'b100;
+    const FUNCT3_SRL_SRA: logic<3> = 3'b101;
+    const FUNCT3_OR     : logic<3> = 3'b110;
+    const FUNCT3_AND    : logic<3> = 3'b111;
 
     // funct7
     const FUNCT7_ADD     : logic<7> = 7'b0000000;
     const FUNCT7_SUB     : logic<7> = 7'b0100000;
+    const FUNCT7_SLL     : logic<7> = 7'b0000000;
+    const FUNCT7_SRL     : logic<7> = 7'b0000000;
+    const FUNCT7_SRA     : logic<7> = 7'b0100000;
+    const FUNCT7_SLT     : logic<7> = 7'b0000000;
+    const FUNCT7_SLTU    : logic<7> = 7'b0000000;
 }
