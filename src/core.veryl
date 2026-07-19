@@ -12,17 +12,6 @@ module Core (
     // program counter
     var pc: logic<32>;
 
-    always_ff {
-        if_reset {
-            pc = 0;
-            for i in 0..32 {
-                regfile[i] = 0;
-            }
-        } else {
-            pc = pc + 4;
-        }
-    }
-
     // fetch
     var instr: logic<32>;
     always_comb {
@@ -56,6 +45,15 @@ module Core (
         data: alu_out,
     );
 
+    // Branch
+    var is_br: logic;
+    inst branch: BranchUnit (
+        ctrl,
+        rs1_data,
+        rs2_data,
+        is_br,
+    );
+
     always_comb {
         dbus.addr = alu_out;
         dbus.wen = ctrl.is_store;
@@ -65,7 +63,23 @@ module Core (
     let wb_data: logic<32> = if ctrl.is_load ? dbus.rdata : alu_out;
 
     always_ff {
-        if ctrl.reg_wb && rd_addr != 0 {
+        if_reset {
+            pc = 0;
+        } else {
+            if is_br {
+                pc = pc + imm;
+            } else {
+                pc = pc + 4;
+            }
+        }
+    }
+
+    always_ff {
+        if_reset {
+            for i in 0..32 {
+                regfile[i] = 0;
+            }
+        } else if ctrl.reg_wb && rd_addr != 0 {
             regfile[rd_addr] = wb_data;
         }
     }

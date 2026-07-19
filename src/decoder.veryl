@@ -18,6 +18,7 @@ module Decoder (
         imm = case op {
             OP_LOAD, OP_OP_IMM: { instr[31] repeat 20, instr[31:20] },
             OP_STORE: { instr[31] repeat 20, instr[31:25], instr[11:7] },
+            OP_BRANCH: { instr[31] repeat 19, instr[31], instr[7], instr[30:25], instr[11:8], 1'b0 },
             default : 'x,
         };
 
@@ -28,6 +29,7 @@ module Decoder (
                 reg_wb   : T,
                 is_load  : T,
                 is_store : F,
+                is_branch: F,
                 funct3   : funct3,
                 funct7   : funct7,
             },
@@ -37,6 +39,7 @@ module Decoder (
                 reg_wb   : F,
                 is_load  : F,
                 is_store : T,
+                is_branch: F,
                 funct3   : funct3,
                 funct7   : funct7,
             },
@@ -46,6 +49,7 @@ module Decoder (
                 reg_wb   : T,
                 is_load  : F,
                 is_store : F,
+                is_branch: F,
                 funct3   : funct3,
                 funct7   : funct7,
             },
@@ -55,6 +59,17 @@ module Decoder (
                 reg_wb   : T,
                 is_load  : F,
                 is_store : F,
+                is_branch: F,
+                funct3   : funct3,
+                funct7   : funct7,
+            },
+            OP_BRANCH: CtrlSignals'{
+                itype    : InstType::B,
+                alu_src_b: F,
+                reg_wb   : F,
+                is_load  : F,
+                is_store : F,
+                is_branch: T,
                 funct3   : funct3,
                 funct7   : funct7,
             },
@@ -64,8 +79,9 @@ module Decoder (
                 reg_wb   : F,
                 is_load  : F,
                 is_store : F,
-                funct3   : funct3,
-                funct7   : funct7,
+                is_branch: F,
+                funct3   : 'x,
+                funct7   : 'x,
             },
         };
     }

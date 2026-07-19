@@ -3,6 +3,7 @@ package Ctrl {
         I,
         S,
         R,
+        B,
         X,
     }
 
@@ -12,6 +13,7 @@ package Ctrl {
         reg_wb: logic,
         is_load: logic,
         is_store: logic,
+        is_branch: logic,
         funct3: logic<3>,
         funct7: logic<7>,
     }

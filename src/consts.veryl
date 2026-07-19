@@ -5,6 +5,7 @@ package Consts {
     const OP_STORE: logic<7> = 7'b0100011;
     const OP_OP:    logic<7> = 7'b0110011;
     const OP_OP_IMM:logic<7> = 7'b0010011;
+    const OP_BRANCH:logic<7> = 7'b1100011;
 
     // funct3
     const FUNCT3_ADD_SUB: logic<3> = 3'b000;
@@ -24,4 +25,12 @@ package Consts {
     const FUNCT7_SRA     : logic<7> = 7'b0100000;
     const FUNCT7_SLT     : logic<7> = 7'b0000000;
     const FUNCT7_SLTU    : logic<7> = 7'b0000000;
+
+    // branch
+    const BR_BEQ:  logic<3> = 3'b000;
+    const BR_BNE:  logic<3> = 3'b001;
+    const BR_BLT:  logic<3> = 3'b100;
+    const BR_BGE:  logic<3> = 3'b101;
+    const BR_BLTU: logic<3> = 3'b110;
+    const BR_BGEU: logic<3> = 3'b111;
 }
