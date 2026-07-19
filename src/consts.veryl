@@ -1,6 +1,18 @@
 package Consts {
-    const XLEN: logic<32> = 32;
+    const XLEN: u32 = 32;
 
     const OP_LOAD:  logic<7> = 7'b0000011;
     const OP_STORE: logic<7> = 7'b0100011;
+    const OP_OP:    logic<7> = 7'b0110011;
+    const OP_OP_IMM:logic<7> = 7'b0010011;
+
+    // funct3
+    const FUNCT3_ADD_SUB: logic<3> = 3'b000;
+    const FUNCT3_XOR     : logic<3> = 3'b100;
+    const FUNCT3_OR      : logic<3> = 3'b110;
+    const FUNCT3_AND     : logic<3> = 3'b111;
+
+    // funct7
+    const FUNCT7_ADD     : logic<7> = 7'b0000000;
+    const FUNCT7_SUB     : logic<7> = 7'b0100000;
 }

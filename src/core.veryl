@@ -58,14 +58,14 @@ module Core (
 
     always_comb {
         dbus.addr = alu_out;
-        dbus.wen = ctrl.itype == InstType::S;
+        dbus.wen = ctrl.is_store;
         dbus.wdata = rs2_data;
     }
 
-    let wb_data: logic<32> = dbus.rdata;
+    let wb_data: logic<32> = if ctrl.is_load ? dbus.rdata : alu_out;
 
     always_ff {
-        if ctrl.is_load {
+        if ctrl.reg_wb && rd_addr != 0 {
             regfile[rd_addr] = wb_data;
         }
     }

@@ -11,11 +11,22 @@ module Alu (
     let a: logic<32> = rs1_data;
     let b: logic<32> = if ctrl.alu_src_b ? imm : rs2_data;
 
+    let is_sub: logic = ctrl.itype == InstType::R && ctrl.funct7 == FUNCT7_SUB;
+
+    let arith_result: logic<32> = case ctrl.funct3 {
+        FUNCT3_ADD_SUB: if is_sub ? a - b : a + b,
+        FUNCT3_XOR    : a ^ b,
+        FUNCT3_OR     : a | b,
+        FUNCT3_AND    : a & b,
+        default       : 0,
+    };
+
     always_comb {
         data = case ctrl.itype {
-            InstType::I: a + b,
+            InstType::I: if ctrl.is_load ? a + b : arith_result,
             InstType::S: a + b,
-            default : 'x,
+            InstType::R: arith_result,
+            default    : 0,
         };
     }
 }

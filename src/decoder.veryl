@@ -16,25 +16,57 @@ module Decoder (
 
     always_comb {
         imm = case op {
-            OP_LOAD : { instr[31] repeat 20, instr[31:20] },
+            OP_LOAD, OP_OP_IMM: { instr[31] repeat 20, instr[31:20] },
             OP_STORE: { instr[31] repeat 20, instr[31:25], instr[11:7] },
             default : 'x,
         };
 
-        ctrl = {
-            case op {
-                OP_LOAD : {
-                    InstType::I, T, T, F,
-                },
-                OP_STORE : {
-                    InstType::S, T, F, T,
-                },
-                default : {
-                    InstType::X, F, F, F,
-                },
+        ctrl = case op {
+            OP_LOAD: CtrlSignals'{
+                itype    : InstType::I,
+                alu_src_b: T,
+                reg_wb   : T,
+                is_load  : T,
+                is_store : F,
+                funct3   : funct3,
+                funct7   : funct7,
             },
-            funct3,
-            funct7,
+            OP_STORE: CtrlSignals'{
+                itype    : InstType::S,
+                alu_src_b: T,
+                reg_wb   : F,
+                is_load  : F,
+                is_store : T,
+                funct3   : funct3,
+                funct7   : funct7,
+            },
+            OP_OP: CtrlSignals'{
+                itype    : InstType::R,
+                alu_src_b: F,
+                reg_wb   : T,
+                is_load  : F,
+                is_store : F,
+                funct3   : funct3,
+                funct7   : funct7,
+            },
+            OP_OP_IMM: CtrlSignals'{
+                itype    : InstType::I,
+                alu_src_b: T,
+                reg_wb   : T,
+                is_load  : F,
+                is_store : F,
+                funct3   : funct3,
+                funct7   : funct7,
+            },
+            default: CtrlSignals'{
+                itype    : InstType::X,
+                alu_src_b: F,
+                reg_wb   : F,
+                is_load  : F,
+                is_store : F,
+                funct3   : funct3,
+                funct7   : funct7,
+            },
         };
     }
 }

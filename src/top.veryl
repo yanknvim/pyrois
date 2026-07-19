@@ -1,4 +1,6 @@
-module Top (
+module Top #(
+    param HEX_FILE: string = "src/tests/test_sw.hex",
+) (
     clk: input clock,
     rst: input reset,
 ) {
@@ -12,7 +14,9 @@ module Top (
         dbus: dbus,
     );
 
-    inst mem: Memory (
+    inst mem: Memory #(
+        HEX_FILE: HEX_FILE,
+    ) (
         ibus: ibus,
         dbus: dbus,
     );

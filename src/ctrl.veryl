@@ -2,12 +2,14 @@ package Ctrl {
     enum InstType {
         I,
         S,
+        R,
         X,
     }
 
     struct CtrlSignals {
         itype: InstType,
         alu_src_b: logic, // T: imm, F: rs2
+        reg_wb: logic,
         is_load: logic,
         is_store: logic,
         funct3: logic<3>,
