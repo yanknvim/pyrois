@@ -60,7 +60,11 @@ module Core (
         dbus.wdata = rs2_data;
     }
 
-    let wb_data: logic<32> = if ctrl.is_load ? dbus.rdata : alu_out;
+    let wb_data: logic<32> = switch {
+        ctrl.is_load : dbus.rdata,
+        ctrl.is_jump: pc + 4,
+        default : alu_out,
+    };
 
     always_ff {
         if_reset {
@@ -68,6 +72,12 @@ module Core (
         } else {
             if is_br {
                 pc = pc + imm;
+            } else if ctrl.is_jump {
+                if ctrl.itype == InstType::I {
+                    pc = alu_out & ~1;
+                } else {
+                    pc = pc + imm;
+                }
             } else {
                 pc = pc + 4;
             }

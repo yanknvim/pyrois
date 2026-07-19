@@ -33,6 +33,7 @@ module Alu (
             InstType::I: if ctrl.is_load ? a + b : arith_result,
             InstType::S: a + b,
             InstType::R: arith_result,
+            InstType::J: 0,
             default    : 0,
         };
     }

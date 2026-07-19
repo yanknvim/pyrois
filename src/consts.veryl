@@ -6,6 +6,8 @@ package Consts {
     const OP_OP:    logic<7> = 7'b0110011;
     const OP_OP_IMM:logic<7> = 7'b0010011;
     const OP_BRANCH:logic<7> = 7'b1100011;
+    const OP_JAL   :logic<7> = 7'b1101111;
+    const OP_JALR  :logic<7> = 7'b1100111;
 
     // funct3
     const FUNCT3_ADD_SUB: logic<3> = 3'b000;
