@@ -58,26 +58,30 @@ module Core (
 
     always_comb {
         dbus.addr = alu_out;
+        dbus.wen = ctrl.itype == InstType::S;
+        dbus.wdata = rs2_data;
     }
 
     let wb_data: logic<32> = dbus.rdata;
 
     always_ff {
-        if ctrl.is_load && rd_addr != 0 {
+        if ctrl.is_load {
             regfile[rd_addr] = wb_data;
         }
     }
 
     always_ff {
-        $display("Addr:     %h", ibus.addr);
-        $display("Inst:     %h", instr);
-        $display("rs1_addr: %h", rs1_addr);
-        $display("rs2_addr: %h", rs2_addr);
-        $display("rd_addr:  %h", rd_addr);
-        $display("rs1_data: %h", rs1_data);
-        $display("rs2_data: %h", rs2_data);
-        $display("wb_data:  %h", wb_data);
-        $display("DataAddr :%h", dbus.addr);
+        $display("Addr:      %h", ibus.addr);
+        $display("Inst:      %h", instr);
+        $display("rs1_addr:  %h", rs1_addr);
+        $display("rs2_addr:  %h", rs2_addr);
+        $display("rd_addr:   %h", rd_addr);
+        $display("rs1_data:  %h", rs1_data);
+        $display("rs2_data:  %h", rs2_data);
+        $display("wb_data:   %h", wb_data);
+        $display("dmem.addr: %h", dbus.addr);
+        $display("dmem.wen:  %h", dbus.wen);
+        $display("dmem.wdata:%h", dbus.wdata);
 
         $display("====================");
     }

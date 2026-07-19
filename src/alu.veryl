@@ -14,6 +14,7 @@ module Alu (
     always_comb {
         data = case ctrl.itype {
             InstType::I: a + b,
+            InstType::S: a + b,
             default : 'x,
         };
     }

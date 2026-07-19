@@ -1,11 +1,13 @@
 module Memory (
+    clk: input clock,
+    rst: input reset,
     ibus: modport InstMembus::slave,
     dbus: modport DataMembus::slave,
 ) {
     var mem: logic<8> [16384]; // 16KB
 
     initial {
-        $readmemh("src/tests/test_lw.hex", mem);
+        $readmemh("src/tests/test_sw.hex", mem);
     }
 
     let iaddr: logic<14> = ibus.addr[13:0];
@@ -27,5 +29,14 @@ module Memory (
             mem[daddr+1],
             mem[daddr],
         };
+    }
+
+    always_ff {
+        if dbus.wen {
+            mem[daddr] = dbus.wdata[7:0];
+            mem[daddr+1] = dbus.wdata[15:8];
+            mem[daddr+2] = dbus.wdata[23:16];
+            mem[daddr+3] = dbus.wdata[31:24];
+        }
     }
 }

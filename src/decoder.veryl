@@ -17,16 +17,20 @@ module Decoder (
     always_comb {
         imm = case op {
             OP_LOAD : { instr[31] repeat 20, instr[31:20] },
+            OP_STORE: { instr[31] repeat 20, instr[31:25], instr[11:7] },
             default : 'x,
         };
 
         ctrl = {
             case op {
                 OP_LOAD : {
-                    InstType::I, T, T,
+                    InstType::I, T, T, F,
+                },
+                OP_STORE : {
+                    InstType::S, T, F, T,
                 },
                 default : {
-                    InstType::X, F, F,
+                    InstType::X, F, F, F,
                 },
             },
             funct3,
