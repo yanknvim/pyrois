@@ -18,6 +18,8 @@ package Ctrl {
         is_store : logic      ,
         is_branch: logic      ,
         is_jump  : logic      ,
+        is_csr   : logic      ,
+        is_ecall : logic      ,
         funct3   : logic   <3>,
         funct7   : logic   <7>,
     }

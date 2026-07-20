@@ -14,13 +14,18 @@ module Decoder (
     let funct3: logic<3> = instr[14:12];
     let funct7: logic<7> = instr[31:25];
 
+    let rd   : logic<5>  = instr[11:7];
+    let rs1  : logic<5>  = instr[19:15];
+    let imm_i: logic<12> = instr[31:20];
+
     always_comb {
         imm = case op {
             OP_LOAD, OP_OP_IMM, OP_JALR: {instr[31] repeat 20, instr[31:20]},
             OP_STORE                   : {instr[31] repeat 20, instr[31:25], instr[11:7]},
             OP_BRANCH                  : {instr[31] repeat 19, instr[31], instr[7], instr[30:25], instr[11:8], 1'b0},
             OP_JAL                     : {instr[31] repeat 12, instr[31], instr[19:12], instr[20], instr[30:21], 1'b0},
-            OP_LUI, OP_AUIPC           : {instr[31:12], 0 repeat 20},
+            OP_LUI, OP_AUIPC           : {instr[31:12], 20'b0},
+            OP_SYSTEM                  : {27'b0, instr[19:15]},
             default                    : 'x,
         };
 
@@ -34,6 +39,8 @@ module Decoder (
                 is_store : F          ,
                 is_branch: F          ,
                 is_jump  : F          ,
+                is_csr   : F          ,
+                is_ecall : F          ,
                 funct3   : funct3     ,
                 funct7   : funct7     ,
             },
@@ -46,6 +53,8 @@ module Decoder (
                 is_store : T          ,
                 is_branch: F          ,
                 is_jump  : F          ,
+                is_csr   : F          ,
+                is_ecall : F          ,
                 funct3   : funct3     ,
                 funct7   : funct7     ,
             },
@@ -58,6 +67,8 @@ module Decoder (
                 is_store : F          ,
                 is_branch: F          ,
                 is_jump  : F          ,
+                is_csr   : F          ,
+                is_ecall : F          ,
                 funct3   : funct3     ,
                 funct7   : funct7     ,
             },
@@ -70,6 +81,8 @@ module Decoder (
                 is_store : F          ,
                 is_branch: F          ,
                 is_jump  : F          ,
+                is_csr   : F          ,
+                is_ecall : F          ,
                 funct3   : funct3     ,
                 funct7   : funct7     ,
             },
@@ -82,6 +95,8 @@ module Decoder (
                 is_store : F          ,
                 is_branch: T          ,
                 is_jump  : F          ,
+                is_csr   : F          ,
+                is_ecall : F          ,
                 funct3   : funct3     ,
                 funct7   : funct7     ,
             },
@@ -94,6 +109,8 @@ module Decoder (
                 is_store : F          ,
                 is_branch: F          ,
                 is_jump  : T          ,
+                is_csr   : F          ,
+                is_ecall : F          ,
                 funct3   : funct3     ,
                 funct7   : funct7     ,
             },
@@ -106,6 +123,8 @@ module Decoder (
                 is_store : F          ,
                 is_branch: F          ,
                 is_jump  : T          ,
+                is_csr   : F          ,
+                is_ecall : F          ,
                 funct3   : funct3     ,
                 funct7   : funct7     ,
             },
@@ -118,6 +137,8 @@ module Decoder (
                 is_store : F          ,
                 is_branch: F          ,
                 is_jump  : F          ,
+                is_csr   : F          ,
+                is_ecall : F          ,
                 funct3   : funct3     ,
                 funct7   : funct7     ,
             },
@@ -130,9 +151,42 @@ module Decoder (
                 is_store : F          ,
                 is_branch: F          ,
                 is_jump  : F          ,
+                is_csr   : F          ,
+                is_ecall : F          ,
                 funct3   : funct3     ,
                 funct7   : funct7     ,
             },
+            OP_SYSTEM  : if funct3 == 3'b000 && rd == 0 && rs1 == 0 && imm_i == 0 ?
+                CtrlSignals'{
+                    itype    : InstType::I,
+                    alu_src_a: F          ,
+                    alu_src_b: F          ,
+                    reg_wb   : F          ,
+                    is_load  : F          ,
+                    is_store : F          ,
+                    is_branch: F          ,
+                    is_jump  : F          ,
+                    is_csr   : F          ,
+                    is_ecall : T          ,
+                    funct3   : funct3     ,
+                    funct7   : funct7     ,
+                }
+            :
+                CtrlSignals'{
+                    itype    : InstType::I,
+                    alu_src_a: F          ,
+                    alu_src_b: T          ,
+                    reg_wb   : T          ,
+                    is_load  : F          ,
+                    is_store : F          ,
+                    is_branch: F          ,
+                    is_jump  : F          ,
+                    is_csr   : T          ,
+                    is_ecall : F          ,
+                    funct3   : funct3     ,
+                    funct7   : funct7     ,
+                }
+            ,
             default    : CtrlSignals'{
                 itype    : InstType::X,
                 alu_src_a: F          ,
@@ -142,6 +196,8 @@ module Decoder (
                 is_store : F          ,
                 is_branch: F          ,
                 is_jump  : F          ,
+                is_csr   : F          ,
+                is_ecall : F          ,
                 funct3   : 'x         ,
                 funct7   : 'x         ,
             },

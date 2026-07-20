@@ -73,16 +73,35 @@ module Core (
         default  : rdata_shifted,
     };
 
+    // csr
+    var csr_rdata: logic<32>;
+    var mtvec    : logic<32>;
+    inst csr: Csr (
+        clk                    ,
+        rst                    ,
+        valid   : ctrl.is_csr  ,
+        addr    : instr[31:20] ,
+        rs1_data               ,
+        imm                    ,
+        ctrl                   ,
+        is_ecall: ctrl.is_ecall,
+        pc                     ,
+        rdata   : csr_rdata    ,
+        mtvec                  ,
+    );
+
     let wb_data: logic<32> = switch {
         ctrl.is_load: load_data,
         ctrl.is_jump: pc + 4,
+        ctrl.is_csr : csr_rdata,
         default     : alu_out,
     };
 
     let next_pc: logic<32> = switch {
-        is_br       : pc + imm,
-        ctrl.is_jump: if ctrl.itype == InstType::I ? alu_out & ~1 : pc + imm,
-        default     : pc + 4,
+        ctrl.is_ecall: mtvec,
+        is_br        : pc + imm,
+        ctrl.is_jump : if ctrl.itype == InstType::I ? alu_out & ~1 : pc + imm,
+        default      : pc + 4,
     };
 
     always_ff {

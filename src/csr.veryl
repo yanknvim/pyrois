@@ -1,0 +1,42 @@
+import Consts::*;
+import Ctrl::*;
+
+module Csr (
+    clk     : input  clock          ,
+    rst     : input  reset          ,
+    valid   : input  logic          ,
+    addr    : input  logic      <12>,
+    rs1_data: input  logic      <32>,
+    imm     : input  logic      <32>,
+    ctrl    : input  CtrlSignals    ,
+    is_ecall: input  logic          ,
+    pc      : input  logic      <32>,
+    rdata   : output logic      <32>,
+    mtvec   : output logic      <32>,
+) {
+    let is_imm: logic     = ctrl.is_csr && ctrl.funct3[2] == 1;
+    let op1   : logic<32> = if is_imm ? imm : rs1_data;
+
+    var csr      : logic<32> [4096];
+    var mtvec_reg: logic<32>       ;
+
+    assign rdata = csr[addr];
+    assign mtvec = mtvec_reg;
+
+    always_ff {
+        if is_ecall {
+            csr[CSR_MEPC]   = pc;
+            csr[CSR_MCAUSE] = 32'd11;
+        } else if valid {
+            csr[addr] = case ctrl.funct3 {
+                CSR_RW, CSR_RWI: op1,
+                CSR_RS, CSR_RSI: rdata | op1,
+                CSR_RC, CSR_RCI: rdata & ~op1,
+                default        : 'x,
+            };
+            if addr == CSR_MTVEC {
+                mtvec_reg = op1;
+            }
+        }
+    }
+}

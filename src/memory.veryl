@@ -26,7 +26,7 @@ module Memory #(
     always_ff {
         if dbus.wen {
             if dbus.be[0] {
-                mem[daddr]     = dbus.wdata[7:0];
+                mem[daddr] = dbus.wdata[7:0];
             }
             if dbus.be[1] {
                 mem[daddr + 1] = dbus.wdata[15:8];

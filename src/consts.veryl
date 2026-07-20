@@ -10,6 +10,7 @@ package Consts {
     const OP_JALR  : logic<7> = 7'b1100111;
     const OP_LUI   : logic<7> = 7'b0110111;
     const OP_AUIPC : logic<7> = 7'b0010111;
+    const OP_SYSTEM: logic<7> = 7'b1110011;
 
     // funct3
     const FUNCT3_ADD_SUB: logic<3> = 3'b000;
@@ -21,8 +22,7 @@ package Consts {
     const FUNCT3_OR     : logic<3> = 3'b110;
     const FUNCT3_AND    : logic<3> = 3'b111;
 
-    // funct3 memory
-
+    // memory
     const FUNCT3_B : logic<3> = 000;
     const FUNCT3_H : logic<3> = 001;
     const FUNCT3_W : logic<3> = 010;
@@ -46,4 +46,17 @@ package Consts {
     const BR_BGE : logic<3> = 3'b101;
     const BR_BLTU: logic<3> = 3'b110;
     const BR_BGEU: logic<3> = 3'b111;
+
+    // csr
+    const CSR_RW : logic<3> = 3'b001;
+    const CSR_RWI: logic<3> = 3'b101;
+    const CSR_RS : logic<3> = 3'b010;
+    const CSR_RSI: logic<3> = 3'b110;
+    const CSR_RC : logic<3> = 3'b011;
+    const CSR_RCI: logic<3> = 3'b111;
+
+    // csr address
+    const CSR_MTVEC : logic<12> = 12'h305;
+    const CSR_MEPC  : logic<12> = 12'h341;
+    const CSR_MCAUSE: logic<12> = 12'h342;
 }
