@@ -52,10 +52,10 @@ module Core (
     always_comb {
         dbus.addr  = alu_out;
         dbus.wen   = ctrl.is_store;
-        dbus.wdata = rs2_data;
+        dbus.wdata = rs2_data << {addr_lo, 3'b000};
         dbus.be    = case ctrl.funct3 {
-            FUNCT3_B: 4'b0001 <: addr_lo,
-            FUNCT3_H: 4'b0011 <: addr_lo,
+            FUNCT3_B: 4'b0001 << addr_lo,
+            FUNCT3_H: 4'b0011 << addr_lo,
             FUNCT3_W: 4'b1111,
             default : 4'b0000,
         };
@@ -130,6 +130,8 @@ module Core (
         $display("rd_addr:   %h", rd_addr);
         $display("rs1_data:  %h", rs1_data);
         $display("rs2_data:  %h", rs2_data);
+        $display("imm:       %h", imm);
+        $display("alu_src_b: %h", ctrl.alu_src_b);
         $display("wb_data:   %h", wb_data);
         $display("dmem.addr: %h", dbus.addr);
         $display("dmem.wen:  %h", dbus.wen);

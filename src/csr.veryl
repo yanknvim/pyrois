@@ -24,7 +24,12 @@ module Csr (
     assign mtvec = mtvec_reg;
 
     always_ff {
-        if is_ecall {
+        if_reset {
+            for i in 0..4096 {
+                csr[i] = 0;
+            }
+            mtvec_reg = 0;
+        } else if is_ecall {
             csr[CSR_MEPC]   = pc;
             csr[CSR_MCAUSE] = 32'd11;
         } else if valid {

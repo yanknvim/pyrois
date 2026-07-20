@@ -1,6 +1,8 @@
 module Top #(
-    param HEX_FILE: string = "src/tests/test_sw.hex",
+    param HEX_FILE: string = "src/tests/isa/rv32ui-p-simple.hex",
 ) (
+    #[ifdef(DEBUG)]
+    test_succeed: output bit,
     clk: input clock,
     rst: input reset,
 ) {
@@ -22,4 +24,14 @@ module Top #(
         ibus: ibus,
         dbus: dbus,
     );
+
+    #[ifdef(DEBUG)]
+    always_ff {
+        if dbus.wen == 1 && dbus.wdata[0] == 1 {
+            if dbus.addr == 'h1000 || dbus.addr == 'h2000 {
+                test_succeed = 1'b1;
+                $finish();
+            }
+        }
+    }
 }

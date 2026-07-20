@@ -23,12 +23,12 @@ package Consts {
     const FUNCT3_AND    : logic<3> = 3'b111;
 
     // memory
-    const FUNCT3_B : logic<3> = 000;
-    const FUNCT3_H : logic<3> = 001;
-    const FUNCT3_W : logic<3> = 010;
-    const FUNCT3_BU: logic<3> = 100;
-    const FUNCT3_HU: logic<3> = 101;
-    const FUNCT3_HW: logic<3> = 110;
+    const FUNCT3_B : logic<3> = 3'b000;
+    const FUNCT3_H : logic<3> = 3'b001;
+    const FUNCT3_W : logic<3> = 3'b010;
+    const FUNCT3_BU: logic<3> = 3'b100;
+    const FUNCT3_HU: logic<3> = 3'b101;
+    const FUNCT3_HW: logic<3> = 3'b110;
 
     // funct7
     const FUNCT7_ADD : logic<7> = 7'b0000000;

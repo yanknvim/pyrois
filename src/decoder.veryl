@@ -24,7 +24,7 @@ module Decoder (
             OP_STORE                   : {instr[31] repeat 20, instr[31:25], instr[11:7]},
             OP_BRANCH                  : {instr[31] repeat 19, instr[31], instr[7], instr[30:25], instr[11:8], 1'b0},
             OP_JAL                     : {instr[31] repeat 12, instr[31], instr[19:12], instr[20], instr[30:21], 1'b0},
-            OP_LUI, OP_AUIPC           : {instr[31:12], 20'b0},
+            OP_LUI, OP_AUIPC           : {instr[31:12], 12'b0},
             OP_SYSTEM                  : {27'b0, instr[19:15]},
             default                    : 'x,
         };

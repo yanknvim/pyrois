@@ -1,41 +1,38 @@
 module Memory #(
-    param HEX_FILE: string = "src/tests/test_sw.hex",
+    param HEX_FILE: string = "src/tests/isa/rv32ui-p-simple.hex",
 ) (
     clk : input   clock            ,
     rst : input   reset            ,
     ibus: modport InstMembus::slave,
     dbus: modport DataMembus::slave,
 ) {
-    var mem: logic<8> [16384]; // 16KB
+    var mem: logic<32> [8192]; // 32KB = 8192 words
 
     initial {
         $readmemh(HEX_FILE, mem);
     }
 
-    let iaddr: logic<14> = ibus.addr[13:0];
-    let daddr: logic<14> = dbus.addr[13:0];
+    let iword_addr = ibus.addr[14:2];
+    let dword_addr = dbus.addr[14:2];
 
     always_comb {
-        ibus.rdata = {mem[iaddr + 3], mem[iaddr + 2], mem[iaddr + 1], mem[iaddr],};
-    }
-
-    always_comb {
-        dbus.rdata = {mem[daddr + 3], mem[daddr + 2], mem[daddr + 1], mem[daddr],};
+        ibus.rdata = mem[iword_addr];
+        dbus.rdata = mem[dword_addr];
     }
 
     always_ff {
         if dbus.wen {
             if dbus.be[0] {
-                mem[daddr] = dbus.wdata[7:0];
+                mem[dword_addr][7:0] = dbus.wdata[7:0];
             }
             if dbus.be[1] {
-                mem[daddr + 1] = dbus.wdata[15:8];
+                mem[dword_addr][15:8] = dbus.wdata[15:8];
             }
             if dbus.be[2] {
-                mem[daddr + 2] = dbus.wdata[23:16];
+                mem[dword_addr][23:16] = dbus.wdata[23:16];
             }
             if dbus.be[3] {
-                mem[daddr + 3] = dbus.wdata[31:24];
+                mem[dword_addr][31:24] = dbus.wdata[31:24];
             }
         }
     }
