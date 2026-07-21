@@ -1,6 +1,7 @@
 package Consts {
     const XLEN: u32 = 32;
 
+    // opcode
     const OP_LOAD  : logic<7> = 7'b0000011;
     const OP_STORE : logic<7> = 7'b0100011;
     const OP_OP    : logic<7> = 7'b0110011;

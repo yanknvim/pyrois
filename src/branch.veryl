@@ -9,7 +9,7 @@ module BranchUnit (
 ) {
 
     always_comb {
-        is_br = if !ctrl.is_branch ?
+        is_br = if ctrl.category != InstCategory::Branch ?
             1'b0
         :
             case ctrl.funct3 {

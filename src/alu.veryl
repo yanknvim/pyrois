@@ -9,8 +9,8 @@ module Alu (
     import Consts::*;
     import Ctrl::*;
 
-    let a: logic<32> = if ctrl.alu_src_a ? pc : rs1_data;
-    let b: logic<32> = if ctrl.alu_src_b ? imm : rs2_data;
+    let a: logic<32> = if ctrl.alu_src_a == AluSrcA::Pc ? pc : rs1_data;
+    let b: logic<32> = if ctrl.alu_src_b == AluSrcB::Imm ? imm : rs2_data;
 
     let is_sub: logic = ctrl.itype == InstType::R && ctrl.funct7 == FUNCT7_SUB;
     let is_sra: logic = ctrl.funct7 == FUNCT7_SRA;
@@ -34,10 +34,10 @@ module Alu (
 
     always_comb {
         data = case ctrl.itype {
-            InstType::I: if ctrl.is_load ? a + b : arith_result,
+            InstType::I: if ctrl.category == InstCategory::Load ? a + b : arith_result,
             InstType::S: a + b,
             InstType::R: arith_result,
-            InstType::U: if ctrl.alu_src_a ? a + b : b,
+            InstType::U: if ctrl.alu_src_a == AluSrcA::Pc ? a + b : b,
             InstType::J: 0,
             default    : 0,
         };

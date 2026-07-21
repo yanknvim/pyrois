@@ -9,18 +9,33 @@ package Ctrl {
         X,
     }
 
+    enum InstCategory {
+        Alu,
+        Load,
+        Store,
+        Branch,
+        Jump,
+        Csr,
+        Ecall,
+    }
+
+    enum AluSrcA {
+        Rs1,
+        Pc,
+    }
+
+    enum AluSrcB {
+        Rs2,
+        Imm,
+    }
+
     struct CtrlSignals {
-        itype    : InstType   ,
-        alu_src_a: logic      , // T: pc, F: rs1
-        alu_src_b: logic      , // T: imm, F: rs2
-        reg_wb   : logic      ,
-        is_load  : logic      ,
-        is_store : logic      ,
-        is_branch: logic      ,
-        is_jump  : logic      ,
-        is_csr   : logic      ,
-        is_ecall : logic      ,
-        funct3   : logic   <3>,
-        funct7   : logic   <7>,
+        itype    : InstType       ,
+        category : InstCategory   ,
+        alu_src_a: AluSrcA        ,
+        alu_src_b: AluSrcB        ,
+        reg_wb   : logic          ,
+        funct3   : logic       <3>,
+        funct7   : logic       <7>,
     }
 }

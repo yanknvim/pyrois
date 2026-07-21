@@ -14,7 +14,7 @@ module Csr (
     rdata   : output logic      <32>,
     mtvec   : output logic      <32>,
 ) {
-    let is_imm: logic     = ctrl.is_csr && ctrl.funct3[2] == 1;
+    let is_imm: logic     = ctrl.category == InstCategory::Csr && ctrl.funct3[2] == 1;
     let op1   : logic<32> = if is_imm ? imm : rs1_data;
 
     var csr      : logic<32> [4096];

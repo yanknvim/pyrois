@@ -51,7 +51,7 @@ module Core (
 
     always_comb {
         dbus.addr  = alu_out;
-        dbus.wen   = ctrl.is_store;
+        dbus.wen   = ctrl.category == InstCategory::Store;
         dbus.wdata = rs2_data << {addr_lo, 3'b000};
         dbus.be    = case ctrl.funct3 {
             FUNCT3_B: 4'b0001 << addr_lo,
@@ -77,31 +77,31 @@ module Core (
     var csr_rdata: logic<32>;
     var mtvec    : logic<32>;
     inst csr: Csr (
-        clk                    ,
-        rst                    ,
-        valid   : ctrl.is_csr  ,
-        addr    : instr[31:20] ,
-        rs1_data               ,
-        imm                    ,
-        ctrl                   ,
-        is_ecall: ctrl.is_ecall,
-        pc                     ,
-        rdata   : csr_rdata    ,
-        mtvec                  ,
+        clk                                           ,
+        rst                                           ,
+        valid   : ctrl.category == InstCategory::Csr,
+        addr    : instr[31:20]                        ,
+        rs1_data                                      ,
+        imm                                           ,
+        ctrl                                          ,
+        is_ecall: ctrl.category == InstCategory::Ecall,
+        pc                                            ,
+        rdata   : csr_rdata                           ,
+        mtvec                                         ,
     );
 
     let wb_data: logic<32> = switch {
-        ctrl.is_load: load_data,
-        ctrl.is_jump: pc + 4,
-        ctrl.is_csr : csr_rdata,
-        default     : alu_out,
+        ctrl.category == InstCategory::Load: load_data,
+        ctrl.category == InstCategory::Jump: pc + 4,
+        ctrl.category == InstCategory::Csr : csr_rdata,
+        default                            : alu_out,
     };
 
     let next_pc: logic<32> = switch {
-        ctrl.is_ecall: mtvec,
-        is_br        : pc + imm,
-        ctrl.is_jump : if ctrl.itype == InstType::I ? alu_out & ~1 : pc + imm,
-        default      : pc + 4,
+        ctrl.category == InstCategory::Ecall: mtvec,
+        is_br                               : pc + imm,
+        ctrl.category == InstCategory::Jump : if ctrl.itype == InstType::I ? alu_out & ~1 : pc + imm,
+        default                             : pc + 4,
     };
 
     always_ff {
