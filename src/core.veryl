@@ -74,20 +74,20 @@ module Core (
     };
 
     // csr
-    var csr_rdata: logic<32>;
-    var mtvec    : logic<32>;
+    var csr_rdata  : logic<32>;
+    var raise_trap : logic    ;
+    var trap_vector: logic<32>;
     inst csr: Csr (
-        clk                                           ,
-        rst                                           ,
-        valid   : ctrl.category == InstCategory::Csr,
-        addr    : instr[31:20]                        ,
-        rs1_data                                      ,
-        imm                                           ,
-        ctrl                                          ,
-        is_ecall: ctrl.category == InstCategory::Ecall,
-        pc                                            ,
-        rdata   : csr_rdata                           ,
-        mtvec                                         ,
+        clk                      ,
+        rst                      ,
+        addr       : instr[31:20],
+        rs1_data                 ,
+        imm                      ,
+        ctrl                     ,
+        pc                       ,
+        rdata      : csr_rdata   ,
+        raise_trap               ,
+        trap_vector              ,
     );
 
     let wb_data: logic<32> = switch {
@@ -98,10 +98,10 @@ module Core (
     };
 
     let next_pc: logic<32> = switch {
-        ctrl.category == InstCategory::Ecall: mtvec,
-        is_br                               : pc + imm,
-        ctrl.category == InstCategory::Jump : if ctrl.itype == InstType::I ? alu_out & ~1 : pc + imm,
-        default                             : pc + 4,
+        raise_trap                         : trap_vector,
+        is_br                              : pc + imm,
+        ctrl.category == InstCategory::Jump: if ctrl.itype == InstType::I ? alu_out & ~1 : pc + imm,
+        default                            : pc + 4,
     };
 
     always_ff {

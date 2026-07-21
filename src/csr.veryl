@@ -2,45 +2,85 @@ import Consts::*;
 import Ctrl::*;
 
 module Csr (
-    clk     : input  clock          ,
-    rst     : input  reset          ,
-    valid   : input  logic          ,
-    addr    : input  logic      <12>,
-    rs1_data: input  logic      <32>,
-    imm     : input  logic      <32>,
-    ctrl    : input  CtrlSignals    ,
-    is_ecall: input  logic          ,
-    pc      : input  logic      <32>,
-    rdata   : output logic      <32>,
-    mtvec   : output logic      <32>,
+    clk        : input  clock          ,
+    rst        : input  reset          ,
+    addr       : input  logic      <12>,
+    rs1_data   : input  logic      <32>,
+    imm        : input  logic      <32>,
+    ctrl       : input  CtrlSignals    ,
+    pc         : input  logic      <32>,
+    rdata      : output logic      <32>,
+    raise_trap : output logic          ,
+    trap_vector: output logic      <32>,
 ) {
+    enum CsrAddr {
+        Mepc = 12'h341,
+        Mcause = 12'h342,
+        Mtvec = 12'h305,
+    }
+
+    enum TrapCause {
+        EcallM = 11,
+    }
+
+    const CSR_RW : logic<3> = 3'b001;
+    const CSR_RWI: logic<3> = 3'b101;
+    const CSR_RS : logic<3> = 3'b010;
+    const CSR_RSI: logic<3> = 3'b110;
+    const CSR_RC : logic<3> = 3'b011;
+    const CSR_RCI: logic<3> = 3'b111;
+
+    const MEPC_MASK  : logic<32> = 32'hFFFFFFFC;
+    const MCAUSE_MASK: logic<32> = 32'hFFFFFFFF;
+    const MTVEC_MASK : logic<32> = 32'hFFFFFFFC;
+
+    var mcause: logic<32>;
+    var mepc  : logic<32>;
+    var mtvec : logic<32>;
+
     let is_imm: logic     = ctrl.category == InstCategory::Csr && ctrl.funct3[2] == 1;
     let op1   : logic<32> = if is_imm ? imm : rs1_data;
 
-    var csr      : logic<32> [4096];
-    var mtvec_reg: logic<32>       ;
+    let write_data: logic<32> = case ctrl.funct3 {
+        CSR_RW, CSR_RWI: op1,
+        CSR_RS, CSR_RSI: rdata | op1,
+        CSR_RC, CSR_RCI: rdata & ~op1,
+        default        : 'x,
+    };
 
-    assign rdata = csr[addr];
-    assign mtvec = mtvec_reg;
+    let wmask: logic<32> = case addr {
+        CsrAddr::Mepc  : MEPC_MASK,
+        CsrAddr::Mcause: MCAUSE_MASK,
+        CsrAddr::Mtvec : MTVEC_MASK,
+        default        : 0,
+    };
+
+    assign rdata = case addr {
+        CsrAddr::Mepc  : mepc,
+        CsrAddr::Mcause: mcause,
+        CsrAddr::Mtvec : mtvec,
+        default        : 0,
+    };
+
+    assign raise_trap  = ctrl.category == InstCategory::Ecall || ctrl.category == InstCategory::Mret;
+    assign trap_vector = if ctrl.category == InstCategory::Mret ? mepc : mtvec;
 
     always_ff {
         if_reset {
-            for i in 0..4096 {
-                csr[i] = 0;
-            }
-            mtvec_reg = 0;
-        } else if is_ecall {
-            csr[CSR_MEPC]   = pc;
-            csr[CSR_MCAUSE] = 32'd11;
-        } else if valid {
-            csr[addr] = case ctrl.funct3 {
-                CSR_RW, CSR_RWI: op1,
-                CSR_RS, CSR_RSI: rdata | op1,
-                CSR_RC, CSR_RCI: rdata & ~op1,
-                default        : 'x,
-            };
-            if addr == CSR_MTVEC {
-                mtvec_reg = op1;
+            mcause = 0;
+            mepc   = 0;
+            mtvec  = 0;
+        } else {
+            if ctrl.category == InstCategory::Ecall {
+                mepc   = pc & MEPC_MASK;
+                mcause = TrapCause::EcallM;
+            } else if ctrl.category == InstCategory::Csr {
+                case addr {
+                    CsrAddr::Mepc  : mepc   = (mepc & ~wmask) | (write_data & wmask);
+                    CsrAddr::Mcause: mcause = (mcause & ~wmask) | (write_data & wmask);
+                    CsrAddr::Mtvec : mtvec  = (mtvec & ~wmask) | (write_data & wmask);
+                    default        : {}
+                }
             }
         }
     }

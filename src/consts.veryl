@@ -48,16 +48,4 @@ package Consts {
     const BR_BLTU: logic<3> = 3'b110;
     const BR_BGEU: logic<3> = 3'b111;
 
-    // csr
-    const CSR_RW : logic<3> = 3'b001;
-    const CSR_RWI: logic<3> = 3'b101;
-    const CSR_RS : logic<3> = 3'b010;
-    const CSR_RSI: logic<3> = 3'b110;
-    const CSR_RC : logic<3> = 3'b011;
-    const CSR_RCI: logic<3> = 3'b111;
-
-    // csr address
-    const CSR_MTVEC : logic<12> = 12'h305;
-    const CSR_MEPC  : logic<12> = 12'h341;
-    const CSR_MCAUSE: logic<12> = 12'h342;
 }
