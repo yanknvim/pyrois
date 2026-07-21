@@ -2,9 +2,9 @@ module Top #(
     param HEX_FILE: string = "src/tests/isa/rv32ui-p-simple.hex",
 ) (
     #[ifdef(DEBUG)]
-    test_succeed: output bit,
-    clk: input clock,
-    rst: input reset,
+    test_succeed: output bit  ,
+    clk         : input  clock,
+    rst         : input  reset,
 ) {
     inst ibus: InstMembus;
     inst dbus: DataMembus;
@@ -27,10 +27,12 @@ module Top #(
 
     #[ifdef(DEBUG)]
     always_ff {
-        if dbus.wen == 1 && dbus.wdata[0] == 1 {
-            if dbus.addr == 'h1000 || dbus.addr == 'h2000 {
-                test_succeed = 1'b1;
-                $finish();
+        if dbus.wen == 1 && (dbus.addr == 'h1000 || dbus.addr == 'h2000) {
+            if dbus.wdata[31] == 1 {
+                $write("%c", dbus.wdata[7:0]);
+            } else if dbus.wdata[0] == 1 {
+                test_succeed = dbus.wdata == 1'b1;
+                $finish     ();
             }
         }
     }

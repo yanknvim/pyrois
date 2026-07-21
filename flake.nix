@@ -3,16 +3,54 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    systems.url = "github:nix-systems/default";
+    git-hooks-nix.url = "github:cachix/git-hooks.nix";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
-      in
-      {
+  outputs = inputs @ {
+    self,
+    nixpkgs,
+    flake-parts,
+    systems,
+    ...
+  }:
+    flake-parts.lib.mkFlake {inherit inputs;} {
+      imports = [
+        inputs.git-hooks-nix.flakeModule
+      ];
+      systems = import systems;
+
+      perSystem = {
+        config,
+        system,
+        pkgs,
+        ...
+      }: {
+        pre-commit = {
+          check.enable = true;
+          settings = {
+            src = ./.;
+
+            hooks = {
+              alejandra.enable = true;
+
+              veryl-fmt = {
+                enable = true;
+                name = "veryl-fmt";
+
+                files = "\\.veryl$";
+                entry = "${pkgs.veryl}/bin/veryl fmt --check";
+              };
+            };
+          };
+        };
+
         devShells.default = pkgs.mkShell {
+          shellHook = ''
+            ${config.pre-commit.shellHook}
+          '';
+          inputsFrom = [config.pre-commit.devShell];
           packages = with pkgs; [
             veryl
 
@@ -26,6 +64,6 @@
             gtkwave
           ];
         };
-      }
-    );
+      };
+    };
 }

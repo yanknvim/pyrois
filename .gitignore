@@ -12,3 +12,7 @@
 
 # gtkwave
 *.vcd
+
+# git-hooks.nix
+.pre-commit-config.yaml
+.pre-commit-cache/
