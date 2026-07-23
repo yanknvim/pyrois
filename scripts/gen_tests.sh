@@ -3,13 +3,14 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+HEX_DIR="${HEX_DIR:-src/tests/isa}"
 output="src/tests.veryl"
-rm "$output"
+rm -f "$output"
 
 shopt -s nullglob
 
 {
-  for f in src/tests/isa/*.hex; do
+  for f in "$HEX_DIR"/*.hex; do
       base=$(basename "$f" .hex)
       name="test_${base//-/_}"
       cat << EOF

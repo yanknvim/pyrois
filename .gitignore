@@ -1,6 +1,7 @@
 # Nix
 .envrc
 .direnv
+result
 
 # Veryl
 *.sv

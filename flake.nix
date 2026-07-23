@@ -6,6 +6,11 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     systems.url = "github:nix-systems/default";
     git-hooks-nix.url = "github:cachix/git-hooks.nix";
+
+    riscv-tests = {
+      url = "git+https://github.com/riscv-software-src/riscv-tests?submodules=1";
+      flake = false;
+    };
   };
 
   outputs = inputs @ {
@@ -18,6 +23,8 @@
     flake-parts.lib.mkFlake {inherit inputs;} {
       imports = [
         inputs.git-hooks-nix.flakeModule
+        ./nix/riscv-tests.nix
+        ./nix/veryl-test.nix
       ];
       systems = import systems;
 
